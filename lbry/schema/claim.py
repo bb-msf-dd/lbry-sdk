@@ -17,7 +17,7 @@ from lbry.schema import compat
 from lbry.schema.base import Signable
 from lbry.schema.mime_types import guess_media_type, guess_stream_type
 from lbry.schema.attrs import (
-    Source, Playable, Dimmensional, Fee, Image, Video, Audio,
+    Source, Playable, Dimmensional, Fee, Image, Video, Audio, DownloadableFile, GuncadFile,
     LanguageList, LocationList, ClaimList, ClaimReference, TagList
 )
 from lbry.schema.types.v2.claim_pb2 import Claim as ClaimMessage
@@ -179,14 +179,6 @@ class BaseClaim:
         self.claim.message.description = description
 
     @property
-    def test_type(self) -> str:
-        return self.claim.message.test_type
-
-    @test_type.setter
-    def test_type(self, test_type: str):
-        self.claim.message.test_type = test_type 
-
-    @property
     def thumbnail(self) -> Source:
         return Source(self.claim.message.thumbnail)
 
@@ -233,7 +225,10 @@ class Stream(BaseClaim):
             fee['amount'] = str(self.fee.amount)
         return claim
 
-    def update(self, file_path=None, height=None, width=None, duration=None, **kwargs):
+    def update(self, file_path=None, height=None, width=None, duration=None, downloadable_file=None, **kwargs):
+        print('TRACEBACK 2 =============')
+        traceback.print_stack()
+        print('END ==============')
 
         if kwargs.pop('clear_fee', False):
             self.message.ClearField('fee')
@@ -256,13 +251,30 @@ class Stream(BaseClaim):
             self.source.file_hash = kwargs.pop('file_hash')
 
         stream_type = None
-        #TODO: check wargs for a special guncad metadata key and if it's found, set stream_type to 'guncad_file'
         if file_path is not None:
             stream_type = self.source.update(file_path=file_path)
         elif self.source.name:
             self.source.media_type, stream_type = guess_media_type(self.source.name)
         elif self.source.media_type:
             stream_type = guess_stream_type(self.source.media_type)
+
+        #TODO: check kwargs for a special guncad metadata key and if it's found, set stream_type to 'guncad_file'
+        print('====== IN UPDATE =====')
+        print(stream_type)
+        print(self.source.media_type)
+        print(json.dumps(kwargs))
+        print('====== IN UPDATE END =====')
+
+        """
+        TODO
+        HAVE A KEY: "downloadable_file"
+        WITH OBJECT VALUE: {
+        }
+
+        EITHER:
+        1. This will "just work"
+        2. Do a "downloadablefile.update" with the contents of this key
+        """
 
         if 'file_size' in kwargs:
             self.source.size = kwargs.pop('file_size')
@@ -284,7 +296,16 @@ class Stream(BaseClaim):
                 media_args['height'] = height
                 media_args['width'] = width
             media.update(**media_args)
-        #TODO: else, set up guncad metadata
+
+        if downloadable_file is not None:
+            guncad_file_keys = ['guncad_category']
+
+            if list(set(downloadable_file.keys()) & set(guncad_file_keys)):
+                gc = getattr(self, 'guncad_file')
+                gc.update(**downloadable_file)
+            else:
+                df = getattr(self, 'downloadable_file')
+                df.update(**downloadable_file)
 
         super().update(**kwargs)
 
@@ -343,6 +364,14 @@ class Stream(BaseClaim):
     @property
     def image(self) -> Image:
         return Image(self.message.image)
+
+    @property
+    def downloadable_file(self) -> DownloadableFile:
+        return DownloadableFile(self.message.downloadable_file)
+
+    @property
+    def guncad_file(self) -> GuncadFile:
+        return GuncadFile(self.message.guncad_file)
 
     @property
     def video(self) -> Video:

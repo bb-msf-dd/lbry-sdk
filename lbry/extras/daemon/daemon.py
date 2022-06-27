@@ -3765,6 +3765,9 @@ class Daemon(metaclass=JSONRPCServerType):
             claim = Claim.from_bytes(old_txo.claim.to_bytes())
 
         if old_txo.claim.is_stream:
+            print('KWARGS IN DAEMON ===================')
+            print(json.dumps(kwargs))
+            print('END ========')
             claim.stream.update(file_path=file_path, **kwargs)
         elif old_txo.claim.is_repost:
             claim.repost.update(**kwargs)

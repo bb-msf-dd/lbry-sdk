@@ -131,6 +131,46 @@ class Video(Dimmensional, Playable):
         Playable.update(self, file_metadata, duration)
 
 
+class DownloadableFile(Metadata):
+
+    __slots__ = ()
+
+    @property
+    def artifact_type(self) -> List[str]:
+        return self.message.artifact_type
+
+    @artifact_type.setter
+    def artifact_type(self, artifact_type: List[str]):
+        print('LINE 144 ==========')
+        print(artifact_type)
+        print(self.message)
+        self.message.artifact_type.extend(artifact_type)
+        print('END ==========')
+
+    def update(self, artifact_type=None):
+        if artifact_type is not None:
+            self.artifact_type = artifact_type
+
+
+class GuncadFile(DownloadableFile):
+
+    __slots__ = ()
+
+    @property
+    def guncad_category(self) -> List[str]:
+        return self.message.guncad_category
+
+    @guncad_category.setter
+    def guncad_category(self, guncad_category: List[str]):
+        self.message.guncad_category.extend(guncad_category)
+
+    def update(self, artifact_type=None, guncad_category=None):
+        DownloadableFile.update(self, artifact_type)
+
+        if guncad_category is not None:
+            self.guncad_category = guncad_category
+
+
 class Source(Metadata):
 
     __slots__ = ()
