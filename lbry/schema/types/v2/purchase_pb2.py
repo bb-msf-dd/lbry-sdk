@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='purchase.proto',
   package='pb',
   syntax='proto3',
-  serialized_pb=_b('\n\x0epurchase.proto\x12\x02pb\"\x1e\n\x08Purchase\x12\x12\n\nclaim_hash\x18\x01 \x01(\x0c\x62\x06proto3')
+  serialized_pb=_b('\n\x0epurchase.proto\x12\x02pb\"\x1e\n\x08Purchase\x12\x12\n\nclaim_hash\x18\x01 \x01(\x0c\x42\x04Z\x02./b\x06proto3')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -66,4 +66,6 @@ Purchase = _reflection.GeneratedProtocolMessageType('Purchase', (_message.Messag
 _sym_db.RegisterMessage(Purchase)
 
 
+DESCRIPTOR.has_options = True
+DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), _b('Z\002./'))
 # @@protoc_insertion_point(module_scope)

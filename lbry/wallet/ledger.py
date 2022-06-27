@@ -3,6 +3,7 @@ import copy
 import time
 import asyncio
 import logging
+import json
 from datetime import datetime
 from functools import partial
 from operator import itemgetter
@@ -783,6 +784,7 @@ class Ledger(metaclass=LedgerRegistry):
             include_received_tips=False,
             hub_server=False) -> Tuple[List[Output], dict, int, int]:
         encoded_outputs = await query
+        #TODO: Garret look here for claim metadata
         if hub_server:
             outputs = Outputs.from_grpc(encoded_outputs)
         else:
@@ -896,15 +898,21 @@ class Ledger(metaclass=LedgerRegistry):
             self, accounts, include_purchase_receipt=False, include_is_my_output=False,
             new_sdk_server=None, **kwargs) -> Tuple[List[Output], dict, int, int]:
         if new_sdk_server:
+            print('LEDGER CLAIM SEARCH 1')
             claim_search = partial(self.network.new_claim_search, new_sdk_server)
         else:
+            print('LEDGER CLAIM SEARCH 2')
             claim_search = self.network.claim_search
-        return await self._inflate_outputs(
+        foo = await self._inflate_outputs(
             claim_search(**kwargs), accounts,
             include_purchase_receipt=include_purchase_receipt,
             include_is_my_output=include_is_my_output,
             hub_server=new_sdk_server is not None
         )
+        print('LEDGER CLAIM SEARCH 3 =====')
+        print(foo)
+        print('END =====')
+        return foo
 
     # async def get_claim_by_claim_id(self, accounts, claim_id, **kwargs) -> Output:
     #     return await self.network.get_claim_by_id(claim_id)

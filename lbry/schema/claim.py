@@ -1,4 +1,6 @@
 import logging
+import json
+import traceback
 from typing import List
 from binascii import hexlify, unhexlify
 
@@ -109,8 +111,18 @@ class BaseClaim:
     def __init__(self, claim: Claim = None):
         self.claim = claim or Claim()
         self.message = self.claim.get_message(self.claim_type)
+        print('CLAIM INIT DATA')
+        print(self.claim)
+        print(self.message)
+        print('END')
 
     def to_dict(self):
+        print('CLAIM TO DICT MESSAGE =====')
+        print(self.claim.message)
+        print('END =====')
+        print('TRACEBACK')
+        traceback.print_stack()
+        print('END ===')
         claim = MessageToDict(self.claim.message, preserving_proto_field_name=True)
         claim.update(claim.pop(self.claim_type))
         if 'languages' in claim:
@@ -165,6 +177,14 @@ class BaseClaim:
     @description.setter
     def description(self, description: str):
         self.claim.message.description = description
+
+    @property
+    def test_type(self) -> str:
+        return self.claim.message.test_type
+
+    @test_type.setter
+    def test_type(self, test_type: str):
+        self.claim.message.test_type = test_type 
 
     @property
     def thumbnail(self) -> Source:
@@ -236,6 +256,7 @@ class Stream(BaseClaim):
             self.source.file_hash = kwargs.pop('file_hash')
 
         stream_type = None
+        #TODO: check wargs for a special guncad metadata key and if it's found, set stream_type to 'guncad_file'
         if file_path is not None:
             stream_type = self.source.update(file_path=file_path)
         elif self.source.name:
@@ -263,6 +284,7 @@ class Stream(BaseClaim):
                 media_args['height'] = height
                 media_args['width'] = width
             media.update(**media_args)
+        #TODO: else, set up guncad metadata
 
         super().update(**kwargs)
 
