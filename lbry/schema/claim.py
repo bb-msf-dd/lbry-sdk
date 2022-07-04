@@ -258,23 +258,11 @@ class Stream(BaseClaim):
         elif self.source.media_type:
             stream_type = guess_stream_type(self.source.media_type)
 
-        #TODO: check kwargs for a special guncad metadata key and if it's found, set stream_type to 'guncad_file'
         print('====== IN UPDATE =====')
         print(stream_type)
         print(self.source.media_type)
         print(json.dumps(kwargs))
         print('====== IN UPDATE END =====')
-
-        """
-        TODO
-        HAVE A KEY: "downloadable_file"
-        WITH OBJECT VALUE: {
-        }
-
-        EITHER:
-        1. This will "just work"
-        2. Do a "downloadablefile.update" with the contents of this key
-        """
 
         if 'file_size' in kwargs:
             self.source.size = kwargs.pop('file_size')

@@ -784,7 +784,6 @@ class Ledger(metaclass=LedgerRegistry):
             include_received_tips=False,
             hub_server=False) -> Tuple[List[Output], dict, int, int]:
         encoded_outputs = await query
-        #TODO: Garret look here for claim metadata
         if hub_server:
             outputs = Outputs.from_grpc(encoded_outputs)
         else:
@@ -903,16 +902,16 @@ class Ledger(metaclass=LedgerRegistry):
         else:
             print('LEDGER CLAIM SEARCH 2')
             claim_search = self.network.claim_search
-        foo = await self._inflate_outputs(
+        search_result = await self._inflate_outputs(
             claim_search(**kwargs), accounts,
             include_purchase_receipt=include_purchase_receipt,
             include_is_my_output=include_is_my_output,
             hub_server=new_sdk_server is not None
         )
         print('LEDGER CLAIM SEARCH 3 =====')
-        print(foo)
+        print(search_result)
         print('END =====')
-        return foo
+        return search_result 
 
     # async def get_claim_by_claim_id(self, accounts, claim_id, **kwargs) -> Output:
     #     return await self.network.get_claim_by_id(claim_id)
