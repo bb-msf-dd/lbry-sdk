@@ -59,6 +59,9 @@ class Signable:
     @classmethod
     def from_bytes(cls, data: bytes):
         signable = cls()
+        print('DATA =====')
+        print(data)
+        print('END =====')
         if data[0] == 0:
             signable.message.ParseFromString(data[1:])
         elif data[0] == 1:

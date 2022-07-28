@@ -105,7 +105,7 @@ class BaseClaim:
     __slots__ = 'claim', 'message'
 
     claim_type = None
-    object_fields = 'thumbnail',
+    object_fields = 'thumbnail', 'downloadable_file', 'guncad_file'
     repeat_fields = 'tags', 'languages', 'locations'
 
     def __init__(self, claim: Claim = None):
@@ -160,7 +160,21 @@ class BaseClaim:
                     raise ValueError(f"Unknown {l} value: {items}")
 
         for key, value in kwargs.items():
-            setattr(self, key, value)
+            print(key)
+            print(value)
+            print(key == 'downloadable_file')
+            print(list(set(value.keys()) & set(['guncad_category'])))
+
+            if key == 'downloadable_file':
+                guncad_file_keys = ['guncad_category']
+                if list(set(value.keys()) & set(guncad_file_keys)):
+                    gc = getattr(self, 'guncad_file')
+                    gc.update(**value)
+                else:
+                    df = getattr(self, 'downloadable_file')
+                    df.update(**value)
+            else:
+                setattr(self, key, value)
 
     @property
     def title(self) -> str:
@@ -198,6 +212,14 @@ class BaseClaim:
     def locations(self) -> LocationList:
         return LocationList(self.claim.message.locations)
 
+    @property
+    def downloadable_file(self) -> DownloadableFile:
+        return DownloadableFile(self.claim.message.downloadable_file)
+
+    @property
+    def guncad_file(self) -> GuncadFile:
+        return GuncadFile(self.claim.message.guncad_file)
+
 
 class Stream(BaseClaim):
 
@@ -225,7 +247,7 @@ class Stream(BaseClaim):
             fee['amount'] = str(self.fee.amount)
         return claim
 
-    def update(self, file_path=None, height=None, width=None, duration=None, downloadable_file=None, **kwargs):
+    def update(self, file_path=None, height=None, width=None, duration=None, **kwargs):
         print('TRACEBACK 2 =============')
         traceback.print_stack()
         print('END ==============')
@@ -285,16 +307,6 @@ class Stream(BaseClaim):
                 media_args['width'] = width
             media.update(**media_args)
 
-        if downloadable_file is not None:
-            guncad_file_keys = ['guncad_category']
-
-            if list(set(downloadable_file.keys()) & set(guncad_file_keys)):
-                gc = getattr(self, 'guncad_file')
-                gc.update(**downloadable_file)
-            else:
-                df = getattr(self, 'downloadable_file')
-                df.update(**downloadable_file)
-
         super().update(**kwargs)
 
     @property
@@ -351,15 +363,7 @@ class Stream(BaseClaim):
 
     @property
     def image(self) -> Image:
-        return Image(self.message.image)
-
-    @property
-    def downloadable_file(self) -> DownloadableFile:
-        return DownloadableFile(self.message.downloadable_file)
-
-    @property
-    def guncad_file(self) -> GuncadFile:
-        return GuncadFile(self.message.guncad_file)
+        return Image(self.message.image) 
 
     @property
     def video(self) -> Video:

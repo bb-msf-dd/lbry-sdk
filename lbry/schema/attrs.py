@@ -141,15 +141,31 @@ class DownloadableFile(Metadata):
 
     @artifact_type.setter
     def artifact_type(self, artifact_type: List[str]):
-        print('LINE 144 ==========')
-        print(artifact_type)
-        print(self.message)
         self.message.artifact_type.extend(artifact_type)
-        print('END ==========')
 
-    def update(self, artifact_type=None):
+    @property
+    def artifact_language(self) -> List[str]:
+        return self.message.artifact_language
+
+    @artifact_language.setter
+    def artifact_language(self, artifact_language: List[str]):
+        self.message.artifact_language.extend(artifact_language)
+
+    @property
+    def release_country(self) -> List[str]:
+        return self.message.release_country
+
+    @release_country.setter
+    def release_country(self, release_country: List[str]):
+        self.message.release_country.extend(release_country)
+
+    def update(self, artifact_type=None, artifact_language=None, release_country=None):
         if artifact_type is not None:
             self.artifact_type = artifact_type
+        if artifact_language is not None:
+            self.artifact_language = artifact_language
+        if release_country is not None:
+            self.release_country = release_country
 
 
 class GuncadFile(DownloadableFile):
@@ -164,11 +180,79 @@ class GuncadFile(DownloadableFile):
     def guncad_category(self, guncad_category: List[str]):
         self.message.guncad_category.extend(guncad_category)
 
-    def update(self, artifact_type=None, guncad_category=None):
-        DownloadableFile.update(self, artifact_type)
+    @property
+    def firearm_type(self) -> List[str]:
+        return self.message.firearm_type
+
+    @firearm_type.setter
+    def firearm_type(self, firearm_type: List[str]):
+        self.message.firearm_type.extend(firearm_type)
+
+    @property
+    def firearm_platform(self) -> List[str]:
+        return self.message.firearm_platform
+
+    @firearm_platform.setter
+    def firearm_platform(self, firearm_platform: List[str]):
+        self.message.firearm_platform.extend(firearm_platform)
+
+    @property
+    def firearm_part(self) -> List[str]:
+        return self.message.firearm_part
+
+    @firearm_part.setter
+    def firearm_part(self, firearm_part: List[str]):
+        self.message.firearm_part.extend(firearm_part)
+
+    @property
+    def firearm_part(self) -> List[str]:
+        return self.message.firearm_part
+
+    @firearm_part.setter
+    def firearm_part(self, firearm_part: List[str]):
+        self.message.firearm_part.extend(firearm_part)
+
+    @property
+    def firearm_caliber(self) -> List[str]:
+        return self.message.firearm_caliber
+
+    @firearm_caliber.setter
+    def firearm_caliber(self, firearm_caliber: List[str]):
+        self.message.firearm_caliber.extend(firearm_caliber)
+
+    @property
+    def fabrication_method(self) -> List[str]:
+        return self.message.fabrication_method
+
+    @fabrication_method.setter
+    def fabrication_method(self, fabrication_method: List[str]):
+        self.message.fabrication_method.extend(fabrication_method)
+
+    @property
+    def fabrication_tools(self) -> List[str]:
+        return self.message.fabrication_tools
+
+    @fabrication_tools.setter
+    def fabrication_tools(self, fabrication_tools: List[str]):
+        self.message.fabrication_tools.extend(fabrication_tools)
+
+    def update(self, artifact_type=None, artifact_language=None, release_country=None, guncad_category=None, firearm_type=None, firearm_platform=None, firearm_part=None, firearm_caliber=None, fabrication_method=None, fabrication_tools=None):
+        DownloadableFile.update(self, artifact_type, artifact_language, release_country)
 
         if guncad_category is not None:
             self.guncad_category = guncad_category
+        if firearm_type is not None:
+            self.firearm_type = firearm_type 
+        if firearm_platform is not None:
+            self.firearm_platform = firearm_platform 
+        if firearm_part is not None:
+            self.firearm_part = firearm_part 
+        if firearm_caliber is not None:
+            self.firearm_caliber = firearm_caliber 
+        if fabrication_method is not None:
+            self.fabrication_method = fabrication_method 
+        if fabrication_tools is not None:
+            self.fabrication_tools = fabrication_tools
 
 
 class Source(Metadata):
