@@ -897,10 +897,8 @@ class Ledger(metaclass=LedgerRegistry):
             self, accounts, include_purchase_receipt=False, include_is_my_output=False,
             new_sdk_server=None, **kwargs) -> Tuple[List[Output], dict, int, int]:
         if new_sdk_server:
-            print('LEDGER CLAIM SEARCH 1')
             claim_search = partial(self.network.new_claim_search, new_sdk_server)
         else:
-            print('LEDGER CLAIM SEARCH 2')
             claim_search = self.network.claim_search
         search_result = await self._inflate_outputs(
             claim_search(**kwargs), accounts,
@@ -908,9 +906,6 @@ class Ledger(metaclass=LedgerRegistry):
             include_is_my_output=include_is_my_output,
             hub_server=new_sdk_server is not None
         )
-        print('LEDGER CLAIM SEARCH 3 =====')
-        print(search_result)
-        print('END =====')
         return search_result 
 
     # async def get_claim_by_claim_id(self, accounts, claim_id, **kwargs) -> Output:

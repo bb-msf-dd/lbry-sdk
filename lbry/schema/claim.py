@@ -1,6 +1,5 @@
 import logging
 import json
-import traceback
 from typing import List
 from binascii import hexlify, unhexlify
 
@@ -111,18 +110,8 @@ class BaseClaim:
     def __init__(self, claim: Claim = None):
         self.claim = claim or Claim()
         self.message = self.claim.get_message(self.claim_type)
-        print('CLAIM INIT DATA')
-        print(self.claim)
-        print(self.message)
-        print('END')
 
     def to_dict(self):
-        print('CLAIM TO DICT MESSAGE =====')
-        print(self.claim.message)
-        print('END =====')
-        print('TRACEBACK')
-        traceback.print_stack()
-        print('END ===')
         claim = MessageToDict(self.claim.message, preserving_proto_field_name=True)
         claim.update(claim.pop(self.claim_type))
         if 'languages' in claim:
@@ -160,11 +149,6 @@ class BaseClaim:
                     raise ValueError(f"Unknown {l} value: {items}")
 
         for key, value in kwargs.items():
-            print(key)
-            print(value)
-            print(key == 'downloadable_file')
-            print(list(set(value.keys()) & set(['guncad_category'])))
-
             if key == 'downloadable_file':
                 guncad_file_keys = ['guncad_category']
                 if list(set(value.keys()) & set(guncad_file_keys)):
@@ -248,10 +232,6 @@ class Stream(BaseClaim):
         return claim
 
     def update(self, file_path=None, height=None, width=None, duration=None, **kwargs):
-        print('TRACEBACK 2 =============')
-        traceback.print_stack()
-        print('END ==============')
-
         if kwargs.pop('clear_fee', False):
             self.message.ClearField('fee')
         else:
@@ -279,12 +259,6 @@ class Stream(BaseClaim):
             self.source.media_type, stream_type = guess_media_type(self.source.name)
         elif self.source.media_type:
             stream_type = guess_stream_type(self.source.media_type)
-
-        print('====== IN UPDATE =====')
-        print(stream_type)
-        print(self.source.media_type)
-        print(json.dumps(kwargs))
-        print('====== IN UPDATE END =====')
 
         if 'file_size' in kwargs:
             self.source.size = kwargs.pop('file_size')

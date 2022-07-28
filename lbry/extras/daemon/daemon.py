@@ -636,19 +636,12 @@ class Daemon(metaclass=JSONRPCServerType):
             )
         return None
 
-    # MAIN INGRESS POINT
     async def handle_old_jsonrpc(self, request):
         ensure_request_allowed(request, self.conf)
         data = await request.json()
-        print('DATA ======================')
-        print(data)
-        print('END =====')
         params = data.get('params', {})
         include_protobuf = params.pop('include_protobuf', False) if isinstance(params, dict) else False
         result = await self._process_rpc_call(data)
-        print('RESULT ======================')
-        print(result)
-        print('END =====')
         ledger = None
         if 'wallet' in self.component_manager.get_components_status():
             # self.ledger only available if wallet component is not skipped
@@ -656,9 +649,6 @@ class Daemon(metaclass=JSONRPCServerType):
         try:
             encoded_result = jsonrpc_dumps_pretty(
                 result, ledger=ledger, include_protobuf=include_protobuf)
-            print('ENCODED RESULT ======================')
-            print(encoded_result)
-            print('END =====')
         except Exception:
             log.exception('Failed to encode JSON RPC result:')
             encoded_result = jsonrpc_dumps_pretty(JSONRPCError(
@@ -783,13 +773,7 @@ class Daemon(metaclass=JSONRPCServerType):
         self.requests_count_metric.labels(method=function_name).inc()
         start = time.perf_counter()
         try:
-            print('METHOD ===== ')
-            print(method)
-            print('END =====')
             result = method(self, *_args, **_kwargs)
-            print('RPC RESULT =====')
-            print(result)
-            print('END =====')
             if asyncio.iscoroutine(result):
                 result = await result
             return result
@@ -2666,11 +2650,6 @@ class Daemon(metaclass=JSONRPCServerType):
         wallet = self.wallet_manager.get_wallet_or_default(kwargs.pop('wallet_id', None))
         kwargs.update({'offset': page_size * (page_num - 1), 'limit': page_size})
         txos, blocked, _, total = await self.ledger.claim_search(wallet.accounts, **kwargs)
-        print('WITHIN CLAIM SEARCH =====')
-        print(txos)
-        print(blocked)
-        print(total)
-        print('END =====')
         result = {
             "items": txos,
             "blocked": blocked,
@@ -2680,9 +2659,6 @@ class Daemon(metaclass=JSONRPCServerType):
         if not kwargs.pop('no_totals', False):
             result['total_pages'] = int((total + (page_size - 1)) / page_size)
             result['total_items'] = total
-        print('CLAIM SEARCH RESULT =====')
-        print(result)
-        print('END =====')
         return result
 
     CHANNEL_DOC = """
@@ -3765,9 +3741,6 @@ class Daemon(metaclass=JSONRPCServerType):
             claim = Claim.from_bytes(old_txo.claim.to_bytes())
 
         if old_txo.claim.is_stream:
-            print('KWARGS IN DAEMON ===================')
-            print(json.dumps(kwargs))
-            print('END ========')
             claim.stream.update(file_path=file_path, **kwargs)
         elif old_txo.claim.is_repost:
             claim.repost.update(**kwargs)
