@@ -131,44 +131,7 @@ class Video(Dimmensional, Playable):
         Playable.update(self, file_metadata, duration)
 
 
-class DownloadableFile(Metadata):
-
-    __slots__ = ()
-
-    @property
-    def artifact_type(self) -> List[str]:
-        return self.message.artifact_type
-
-    @artifact_type.setter
-    def artifact_type(self, artifact_type: List[str]):
-        self.message.artifact_type.extend(artifact_type)
-
-    @property
-    def artifact_language(self) -> List[str]:
-        return self.message.artifact_language
-
-    @artifact_language.setter
-    def artifact_language(self, artifact_language: List[str]):
-        self.message.artifact_language.extend(artifact_language)
-
-    @property
-    def release_country(self) -> List[str]:
-        return self.message.release_country
-
-    @release_country.setter
-    def release_country(self, release_country: List[str]):
-        self.message.release_country.extend(release_country)
-
-    def update(self, artifact_type=None, artifact_language=None, release_country=None):
-        if artifact_type is not None:
-            self.artifact_type = artifact_type
-        if artifact_language is not None:
-            self.artifact_language = artifact_language
-        if release_country is not None:
-            self.release_country = release_country
-
-
-class GuncadFile(DownloadableFile):
+class Guncad(Metadata):
 
     __slots__ = ()
 
@@ -236,9 +199,7 @@ class GuncadFile(DownloadableFile):
     def fabrication_tools(self, fabrication_tools: List[str]):
         self.message.fabrication_tools.extend(fabrication_tools)
 
-    def update(self, artifact_type=None, artifact_language=None, release_country=None, guncad_category=None, firearm_type=None, firearm_platform=None, firearm_part=None, firearm_caliber=None, fabrication_method=None, fabrication_tools=None):
-        DownloadableFile.update(self, artifact_type, artifact_language, release_country)
-
+    def update(self, guncad_category=None, firearm_type=None, firearm_platform=None, firearm_part=None, firearm_caliber=None, fabrication_method=None, fabrication_tools=None, **kwargs):
         if guncad_category is not None:
             self.guncad_category = guncad_category
         if firearm_type is not None:

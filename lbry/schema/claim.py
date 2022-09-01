@@ -16,7 +16,7 @@ from lbry.schema import compat
 from lbry.schema.base import Signable
 from lbry.schema.mime_types import guess_media_type, guess_stream_type
 from lbry.schema.attrs import (
-    Source, Playable, Dimmensional, Fee, Image, Video, Audio, DownloadableFile, GuncadFile,
+    Source, Playable, Dimmensional, Fee, Image, Video, Audio, Guncad,
     LanguageList, LocationList, ClaimList, ClaimReference, TagList
 )
 from lbry.schema.types.v2.claim_pb2 import Claim as ClaimMessage
@@ -104,7 +104,7 @@ class BaseClaim:
     __slots__ = 'claim', 'message'
 
     claim_type = None
-    object_fields = 'thumbnail', 'downloadable_file', 'guncad_file'
+    object_fields = 'thumbnail',
     repeat_fields = 'tags', 'languages', 'locations'
 
     def __init__(self, claim: Claim = None):
@@ -146,19 +146,7 @@ class BaseClaim:
                 elif isinstance(items, list):
                     field.extend(items)
                 else:
-                    raise ValueError(f"Unknown {l} value: {items}")
-
-        for key, value in kwargs.items():
-            if key == 'downloadable_file':
-                guncad_file_keys = ['guncad_category']
-                if list(set(value.keys()) & set(guncad_file_keys)):
-                    gc = getattr(self, 'guncad_file')
-                    gc.update(**value)
-                else:
-                    df = getattr(self, 'downloadable_file')
-                    df.update(**value)
-            else:
-                setattr(self, key, value)
+                    raise ValueError(f"Unknown {l} value: {items}") 
 
     @property
     def title(self) -> str:
@@ -195,14 +183,6 @@ class BaseClaim:
     @property
     def locations(self) -> LocationList:
         return LocationList(self.claim.message.locations)
-
-    @property
-    def downloadable_file(self) -> DownloadableFile:
-        return DownloadableFile(self.claim.message.downloadable_file)
-
-    @property
-    def guncad_file(self) -> GuncadFile:
-        return GuncadFile(self.claim.message.guncad_file)
 
 
 class Stream(BaseClaim):
@@ -253,7 +233,9 @@ class Stream(BaseClaim):
             self.source.file_hash = kwargs.pop('file_hash')
 
         stream_type = None
-        if file_path is not None:
+        if 'guncad' in kwargs:
+            stream_type = 'guncad'
+        elif file_path is not None:
             stream_type = self.source.update(file_path=file_path)
         elif self.source.name:
             self.source.media_type, stream_type = guess_media_type(self.source.name)
@@ -280,6 +262,11 @@ class Stream(BaseClaim):
                 media_args['height'] = height
                 media_args['width'] = width
             media.update(**media_args)
+        elif stream_type == 'guncad':
+            gc = getattr(self, 'guncad')
+            guncad_metadata = kwargs['guncad']
+            #print(**kwargs['guncad'])
+            gc.update(**guncad_metadata)
 
         super().update(**kwargs)
 
@@ -346,6 +333,10 @@ class Stream(BaseClaim):
     @property
     def audio(self) -> Audio:
         return Audio(self.message.audio)
+
+    @property
+    def guncad(self) -> Guncad:
+        return Guncad(self.message.guncad)
 
 
 class Channel(BaseClaim):
