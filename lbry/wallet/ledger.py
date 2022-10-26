@@ -3,6 +3,7 @@ import copy
 import time
 import asyncio
 import logging
+import json
 from datetime import datetime
 from functools import partial
 from operator import itemgetter
@@ -899,12 +900,13 @@ class Ledger(metaclass=LedgerRegistry):
             claim_search = partial(self.network.new_claim_search, new_sdk_server)
         else:
             claim_search = self.network.claim_search
-        return await self._inflate_outputs(
+        search_result = await self._inflate_outputs(
             claim_search(**kwargs), accounts,
             include_purchase_receipt=include_purchase_receipt,
             include_is_my_output=include_is_my_output,
             hub_server=new_sdk_server is not None
         )
+        return search_result 
 
     # async def get_claim_by_claim_id(self, accounts, claim_id, **kwargs) -> Output:
     #     return await self.network.get_claim_by_id(claim_id)

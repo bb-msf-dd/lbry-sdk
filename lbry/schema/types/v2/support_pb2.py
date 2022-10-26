@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='support.proto',
   package='pb',
   syntax='proto3',
-  serialized_pb=_b('\n\rsupport.proto\x12\x02pb\")\n\x07Support\x12\r\n\x05\x65moji\x18\x01 \x01(\t\x12\x0f\n\x07\x63omment\x18\x02 \x01(\tb\x06proto3')
+  serialized_pb=_b('\n\rsupport.proto\x12\x02pb\")\n\x07Support\x12\r\n\x05\x65moji\x18\x01 \x01(\t\x12\x0f\n\x07\x63omment\x18\x02 \x01(\tB\x04Z\x02./b\x06proto3')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -73,4 +73,6 @@ Support = _reflection.GeneratedProtocolMessageType('Support', (_message.Message,
 _sym_db.RegisterMessage(Support)
 
 
+DESCRIPTOR.has_options = True
+DESCRIPTOR._options = _descriptor._ParseOptions(descriptor_pb2.FileOptions(), _b('Z\002./'))
 # @@protoc_insertion_point(module_scope)

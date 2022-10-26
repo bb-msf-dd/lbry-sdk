@@ -1,4 +1,5 @@
 import logging
+import json
 from typing import List
 from binascii import hexlify, unhexlify
 
@@ -15,7 +16,7 @@ from lbry.schema import compat
 from lbry.schema.base import Signable
 from lbry.schema.mime_types import guess_media_type, guess_stream_type
 from lbry.schema.attrs import (
-    Source, Playable, Dimmensional, Fee, Image, Video, Audio,
+    Source, Playable, Dimmensional, Fee, Image, Video, Audio, Guncad,
     LanguageList, LocationList, ClaimList, ClaimReference, TagList
 )
 from lbry.schema.types.v2.claim_pb2 import Claim as ClaimMessage
@@ -145,10 +146,7 @@ class BaseClaim:
                 elif isinstance(items, list):
                     field.extend(items)
                 else:
-                    raise ValueError(f"Unknown {l} value: {items}")
-
-        for key, value in kwargs.items():
-            setattr(self, key, value)
+                    raise ValueError(f"Unknown {l} value: {items}") 
 
     @property
     def title(self) -> str:
@@ -214,7 +212,6 @@ class Stream(BaseClaim):
         return claim
 
     def update(self, file_path=None, height=None, width=None, duration=None, **kwargs):
-
         if kwargs.pop('clear_fee', False):
             self.message.ClearField('fee')
         else:
@@ -236,7 +233,9 @@ class Stream(BaseClaim):
             self.source.file_hash = kwargs.pop('file_hash')
 
         stream_type = None
-        if file_path is not None:
+        if 'guncad' in kwargs:
+            stream_type = 'guncad'
+        elif file_path is not None:
             stream_type = self.source.update(file_path=file_path)
         elif self.source.name:
             self.source.media_type, stream_type = guess_media_type(self.source.name)
@@ -263,6 +262,11 @@ class Stream(BaseClaim):
                 media_args['height'] = height
                 media_args['width'] = width
             media.update(**media_args)
+        elif stream_type == 'guncad':
+            gc = getattr(self, 'guncad')
+            guncad_metadata = kwargs['guncad']
+            #print(**kwargs['guncad'])
+            gc.update(**guncad_metadata)
 
         super().update(**kwargs)
 
@@ -320,7 +324,7 @@ class Stream(BaseClaim):
 
     @property
     def image(self) -> Image:
-        return Image(self.message.image)
+        return Image(self.message.image) 
 
     @property
     def video(self) -> Video:
@@ -329,6 +333,10 @@ class Stream(BaseClaim):
     @property
     def audio(self) -> Audio:
         return Audio(self.message.audio)
+
+    @property
+    def guncad(self) -> Guncad:
+        return Guncad(self.message.guncad)
 
 
 class Channel(BaseClaim):
